@@ -84,11 +84,6 @@ jobs:
           -input=false \
           ${{ env.terraform_action == 'destroy' && '-destroy' || '' }}
 
-        uses: actions/upload-artifact@v4
-        with:
-          name: module
-          path: ./staging/
-
       - name: Show the Plan for Review
         run: |
           terraform \
