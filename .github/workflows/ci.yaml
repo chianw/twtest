@@ -17,6 +17,8 @@ on:
 
 env:
   ARM_PROVIDER_ENHANCED_VALIDATION: "false"
+  root_module_folder_relative_path: "."
+  terraform_cli_versions: "latest"
 
 jobs:
   validate:
@@ -31,19 +33,19 @@ jobs:
         uses: hashicorp/setup-terraform@v3
         with:
           terraform_wrapper: false
-          terraform_version: ${{ inputs.terraform_cli_versions }}
+          terraform_version: ${{ env.terraform_cli_versions }}
 
       - name: Terraform Init
         run: |
           terraform \
-          -chdir="${{ inputs.root_module_folder_relative_path }}" \
+          -chdir="${{ env.root_module_folder_relative_path }}" \
           init \
           -backend=false
 
       - name: Terraform Validate
         run: |
           terraform \
-          -chdir="${{ inputs.root_module_folder_relative_path}}" \
+          -chdir="${{ env.root_module_folder_relative_path }}" \
           validate
 
   plan:
@@ -74,12 +76,12 @@ jobs:
         uses: hashicorp/setup-terraform@v3
         with:
           terraform_wrapper: false
-          terraform_version: ${{ inputs.terraform_cli_versions }}
+          terraform_version: ${{ env.terraform_cli_versions }}
 
       - name: Terraform Init
         run: |
           terraform \
-          -chdir="${{inputs.root_module_folder_relative_path}}" \
+          -chdir="${{ env.root_module_folder_relative_path }}" \
           init \
           -backend-config="resource_group_name=${{vars.BACKEND_AZURE_RESOURCE_GROUP_NAME}}" \
           -backend-config="storage_account_name=${{vars.BACKEND_AZURE_STORAGE_ACCOUNT_NAME}}" \
@@ -90,7 +92,7 @@ jobs:
         id: plan
         run: |
           terraform \
-          -chdir="${{inputs.root_module_folder_relative_path}}" \
+          -chdir="${{ env.root_module_folder_relative_path }}" \
           plan \
           -input=false
 
