@@ -25,6 +25,9 @@ on:
 
 env:
   ARM_PROVIDER_ENHANCED_VALIDATION: "false"
+  root_module_folder_relative_path: "."
+  terraform_cli_versions: "latest"
+  terraform_action: "apply"  
 
 jobs:
   plan:
@@ -50,32 +53,32 @@ jobs:
         uses: hashicorp/setup-terraform@v3
         with:
           terraform_wrapper: false
-          terraform_version: ${{ inputs.terraform_cli_versions }}
+          terraform_version: ${{ env.terraform_cli_versions }}
 
       - name: Terraform Init
         run: |
           terraform \
-          -chdir="${{ inputs.root_module_folder_relative_path }}" \
+          -chdir="${{ env.root_module_folder_relative_path }}" \
           init \
           -backend-config="resource_group_name=${{vars.BACKEND_AZURE_RESOURCE_GROUP_NAME}}" \
           -backend-config="storage_account_name=${{vars.BACKEND_AZURE_STORAGE_ACCOUNT_NAME}}" \
           -backend-config="container_name=${{vars.BACKEND_AZURE_STORAGE_ACCOUNT_CONTAINER_NAME}}" \
           -backend-config="key=${{vars.BACKEND_TFSTATE_FILENAME}}"
 
-      - name: Terraform Plan for ${{ inputs.terraform_action == 'destroy' && 'Destroy' || 'Apply' }}
+      - name: Terraform Plan for ${{ env.terraform_action == 'destroy' && 'Destroy' || 'Apply' }}
         run: |
           # shellcheck disable=SC2086
           terraform \
-          -chdir="${{ inputs.root_module_folder_relative_path }}" \
+          -chdir="${{ env.root_module_folder_relative_path }}" \
           plan \
           -out=tfplan \
           -input=false \
-          ${{ inputs.terraform_action == 'destroy' && '-destroy' || '' }}
+          ${{ env.terraform_action == 'destroy' && '-destroy' || '' }}
 
       - name: Create Module Artifact
         run: |
           $stagingDirectory = "staging"
-          $rootModuleFolder = "${{ inputs.root_module_folder_relative_path }}"
+          $rootModuleFolder = "${{ env.root_module_folder_relative_path }}"
           New-Item -Path . -Name $stagingDirectory -ItemType "directory"
           Copy-Item -Path "./*" -Exclude @(".git", ".terraform", ".github",  $stagingDirectory) -Recurse -Destination "./$stagingDirectory"
 
@@ -95,7 +98,7 @@ jobs:
       - name: Show the Plan for Review
         run: |
           terraform \
-          -chdir="${{ inputs.root_module_folder_relative_path }}" \
+          -chdir="${{ env.root_module_folder_relative_path }}" \
           show \
           tfplan
 
@@ -126,22 +129,22 @@ jobs:
         uses: hashicorp/setup-terraform@v3
         with:
           terraform_wrapper: false
-          terraform_version: ${{ inputs.terraform_cli_versions }}
+          terraform_version: ${{ env.terraform_cli_versions }}
 
       - name: Terraform Init
         run: |
           terraform \
-          -chdir="${{ inputs.root_module_folder_relative_path }}" \
+          -chdir="${{ env.root_module_folder_relative_path }}" \
           init \
           -backend-config="resource_group_name=${{vars.BACKEND_AZURE_RESOURCE_GROUP_NAME}}" \
           -backend-config="storage_account_name=${{vars.BACKEND_AZURE_STORAGE_ACCOUNT_NAME}}" \
           -backend-config="container_name=${{vars.BACKEND_AZURE_STORAGE_ACCOUNT_CONTAINER_NAME}}" \
           -backend-config="key=${{vars.BACKEND_TFSTATE_FILENAME}}"
 
-      - name: Terraform ${{ inputs.terraform_action == 'destroy' && 'Destroy' || 'Apply' }}
+      - name: Terraform ${{ env.terraform_action == 'destroy' && 'Destroy' || 'Apply' }}
         run: |
           terraform \
-          -chdir="${{ inputs.root_module_folder_relative_path }}" \
+          -chdir="${{ env.root_module_folder_relative_path }}" \
           apply \
           -input=false \
           -auto-approve \
