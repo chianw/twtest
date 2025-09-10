@@ -16,6 +16,9 @@ on:
         default: 'latest'
         type: string
 
+env:
+  ARM_PROVIDER_ENHANCED_VALIDATION: "false"
+
 jobs:
   plan:
     name: Plan with Terraform
