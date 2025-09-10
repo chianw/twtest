@@ -1,12 +1,19 @@
 ---
 name: Continuous Delivery
 on:
-  workflow_call:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
     inputs:
       terraform_action:
         description: 'Terraform Action to perform'
+        required: true
         default: 'apply'
-        type: string
+        type: choice
+        options:
+          - 'apply'
+          - 'destroy'
       root_module_folder_relative_path:
         description: 'Root Module Folder Relative Path'
         default: '.'

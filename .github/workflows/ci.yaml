@@ -1,7 +1,10 @@
 ---
 name: Continuous Integration
 on:
-  workflow_call:
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
     inputs:
       root_module_folder_relative_path:
         description: 'Root Module Folder Relative Path'
