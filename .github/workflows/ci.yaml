@@ -17,8 +17,6 @@ on:
 
 env:
   ARM_PROVIDER_ENHANCED_VALIDATION: "false"
-  root_module_folder_relative_path: "."
-  terraform_cli_versions: "latest"
 
 jobs:
   plan:
@@ -41,6 +39,16 @@ jobs:
       ARM_USE_AZUREAD: true
       ARM_USE_OIDC: true
     steps:
+      - name: Set Environment Variables
+        run: |
+          if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
+            echo "terraform_cli_versions=${{ inputs.terraform_cli_versions }}" >> $GITHUB_ENV
+            echo "root_module_folder_relative_path=${{ inputs.root_module_folder_relative_path }}" >> $GITHUB_ENV
+          else
+            echo "terraform_cli_versions=latest" >> $GITHUB_ENV
+            echo "root_module_folder_relative_path=." >> $GITHUB_ENV
+          fi
+
       - name: Checkout Code
         uses: actions/checkout@v4
 
