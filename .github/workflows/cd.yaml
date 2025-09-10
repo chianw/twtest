@@ -84,6 +84,26 @@ jobs:
           -input=false \
           ${{ env.terraform_action == 'destroy' && '-destroy' || '' }}
 
+      - name: Create Module Artifact
+        run: |
+          $stagingDirectory = "staging"
+          $rootModuleFolder = "${{ env.root_module_folder_relative_path }}"
+          New-Item -Path . -Name $stagingDirectory -ItemType "directory"
+          Copy-Item -Path "./*" -Exclude @(".git", ".terraform", ".github",  $stagingDirectory) -Recurse -Destination "./$stagingDirectory"
+
+          $rootModuleFolderTerraformFolder = Join-Path -Path "./$stagingDirectory" -ChildPath $rootModuleFolder -AdditionalChildPath ".terraform"
+          if(Test-Path -Path $rootModuleFolderTerraformFolder) {
+            Remove-Item -Path $rootModuleFolderTerraformFolder -Recurse -Force
+          }
+
+        shell: pwsh
+
+      - name: Publish Module Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: module
+          path: ./staging/
+
       - name: Show the Plan for Review
         run: |
           terraform \
@@ -120,6 +140,11 @@ jobs:
             echo "root_module_folder_relative_path=." >> $GITHUB_ENV
             echo "terraform_action=apply" >> $GITHUB_ENV
           fi
+
+      - name: Download a Build Artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: module
 
       - name: Install Terraform
         uses: hashicorp/setup-terraform@v3
