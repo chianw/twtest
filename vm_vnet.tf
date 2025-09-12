@@ -13,7 +13,7 @@ locals {
 }
 
 resource "random_integer" "zone_index" {
-  max = length(module.regions.regions_by_name[local.deployment_region].zones)
+  max = 3
   min = 1
 }
 
