@@ -15,4 +15,5 @@ module "avm-res-storage-storageaccount" {
   name                      = module.naming.storage_account.name_unique
   account_replication_type  = "LRS"
   shared_access_key_enabled = true
+  depends_on = [ azurerm_role_assignment.example ]
 }
