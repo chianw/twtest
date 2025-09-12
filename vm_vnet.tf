@@ -1,3 +1,12 @@
+/*
+Tests the following:
+- Azure/avm-res-network-virtualnetwork/azurerm
+- Azure/avm-res-keyvault-vault/azurerm"
+- Azure/avm-res-compute-virtualmachine/azurerm
+- Azure/avm-res-network-networksecuritygroup
+
+*/
+
 module "naming" {
   source  = "Azure/naming/azurerm"
   version = "~> 0.4"
@@ -12,11 +21,6 @@ locals {
   }
 }
 
-resource "random_integer" "zone_index" {
-  max = 3
-  min = 1
-}
-
 
 resource "azurerm_resource_group" "this_rg" {
   location = local.deployment_region
@@ -24,38 +28,21 @@ resource "azurerm_resource_group" "this_rg" {
   tags     = local.tags
 }
 
-module "vm_sku" {
-  source  = "Azure/avm-utl-sku-finder/azapi"
-  version = "0.3.0"
 
-  location      = azurerm_resource_group.this_rg.location
-  cache_results = true
-  vm_filters = {
-    min_vcpus                      = 2
-    max_vcpus                      = 2
-    encryption_at_host_supported   = true
-    accelerated_networking_enabled = false
-    premium_io_supported           = true
-    location_zone                  = random_integer.zone_index.result
-  }
+# module "natgateway" {
+#   source  = "Azure/avm-res-network-natgateway/azurerm"
+#   version = "0.2.1"
 
-  depends_on = [random_integer.zone_index]
-}
-
-module "natgateway" {
-  source  = "Azure/avm-res-network-natgateway/azurerm"
-  version = "0.2.1"
-
-  location            = azurerm_resource_group.this_rg.location
-  name                = module.naming.nat_gateway.name_unique
-  resource_group_name = azurerm_resource_group.this_rg.name
-  enable_telemetry    = true
-  public_ips = {
-    public_ip_1 = {
-      name = "nat_gw_pip1"
-    }
-  }
-}
+#   location            = azurerm_resource_group.this_rg.location
+#   name                = module.naming.nat_gateway.name_unique
+#   resource_group_name = azurerm_resource_group.this_rg.name
+#   enable_telemetry    = true
+#   public_ips = {
+#     public_ip_1 = {
+#       name = "nat_gw_pip1"
+#     }
+#   }
+# }
 
 module "vnet" {
   source  = "Azure/avm-res-network-virtualnetwork/azurerm"
@@ -65,23 +52,30 @@ module "vnet" {
   location            = azurerm_resource_group.this_rg.location
   resource_group_name = azurerm_resource_group.this_rg.name
   name                = module.naming.virtual_network.name_unique
-  subnets = {
-    vm_subnet_1 = {
-      name             = "${module.naming.subnet.name_unique}-1"
-      address_prefixes = ["10.0.1.0/24"]
-      nat_gateway = {
-        id = module.natgateway.resource_id
-      }
-    }
-    vm_subnet_2 = {
-      name             = "${module.naming.subnet.name_unique}-2"
-      address_prefixes = ["10.0.2.0/24"]
-      nat_gateway = {
-        id = module.natgateway.resource_id
-      }
-    }
+}
+
+
+module "avm-res-network-subnet" {
+  source  = "Azure/avm-res-network-virtualnetwork/azurerm//modules/subnet"
+  version = "0.10.0"
+  virtual_network = {
+    resource_id = module.vnet.resource_id
+  }
+  name             = "subnet_1"
+  address_prefixes = ["10.0.0.0/24"]
+  network_security_group = {
+    id = module.avm-res-network-networksecuritygroup.resource_id
   }
 }
+
+module "avm-res-network-networksecuritygroup" {
+  source              = "Azure/avm-res-network-networksecuritygroup/azurerm"
+  version             = "0.5.0"
+  location            = azurerm_resource_group.this_rg.location
+  resource_group_name = azurerm_resource_group.this_rg.name
+  name                = module.naming.network_security_group.name_unique
+}
+
 
 resource "azurerm_resource_group" "this_rg_secondary" {
   location = local.deployment_region
@@ -228,14 +222,14 @@ module "testvm" {
       ip_configurations = {
         ip_configuration_avs_facing = {
           name                          = "${module.naming.network_interface.name_unique}-nic2-ipconfig1"
-          private_ip_subnet_resource_id = module.vnet.subnets["vm_subnet_2"].resource_id
+          private_ip_subnet_resource_id = module.avm-res-network-subnet.resource_id
         }
       }
       is_primary = true
     }
   }
   resource_group_name = azurerm_resource_group.this_rg.name
-  zone                = random_integer.zone_index.result
+  zone                = 1
   account_credentials = {
     admin_credentials = {
       username                           = "azureuser"
@@ -290,7 +284,7 @@ module "testvm" {
       principal_type             = "ServicePrincipal"
     }
   }
-  sku_size = module.vm_sku.sku
+  sku_size = "Standard_B2ms"
   source_image_reference = {
     publisher = "Canonical"
     offer     = "0001-com-ubuntu-server-focal"
