@@ -3,7 +3,7 @@
 resource "azurerm_role_assignment" "example" {
   scope                = azurerm_resource_group.this_rg.id
   role_definition_name = "Storage Blob Data Contributor"
-  principal_id         = data.azurerm_client_config.example.object_id
+  principal_id         = data.azurerm_client_config.current.object_id
 }
 
 
