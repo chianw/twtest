@@ -1,7 +1,5 @@
 # assign service principal Storage Blob Data Contributor role scoped to the resource group
 
-data "azurerm_client_config" "current" {}
-
 resource "azurerm_role_assignment" "example" {
   scope                = azurerm_resource_group.this_rg.id
   role_definition_name = "Storage Blob Data Contributor"
