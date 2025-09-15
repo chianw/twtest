@@ -1,7 +1,7 @@
 /*
 Tests the following:
 - Azure/avm-res-network-virtualnetwork/azurerm
-- Azure/avm-res-keyvault-vault/azurerm"
+- Azure/avm-res-keyvault-vault/azurerm
 - Azure/avm-res-compute-virtualmachine/azurerm
 - Azure/avm-res-network-networksecuritygroup
 
