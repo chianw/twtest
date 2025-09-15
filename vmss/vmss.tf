@@ -22,7 +22,7 @@ module "avm-res-compute-virtualmachinescaleset" {
     linux_configuration = {
       disable_password_authentication = true
       admin_username                  = "azureuser"
-      patch_mode                      = "Manual"
+      patch_mode                      = "ImageDefault"
     }
   }
 
