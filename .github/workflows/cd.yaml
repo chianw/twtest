@@ -1,9 +1,9 @@
 ---
 name: Continuous Delivery
 on:
-  push:
-    branches:
-      - main
+  # push:
+  #   branches:
+  #     - main
   workflow_dispatch:
     inputs:
       terraform_action:

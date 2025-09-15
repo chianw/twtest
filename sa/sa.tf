@@ -1,3 +1,24 @@
+module "naming" {
+  source  = "Azure/naming/azurerm"
+  version = "~> 0.4"
+}
+
+
+locals {
+  #deployment_region = module.regions.regions[random_integer.region_index.result].name
+  deployment_region = "taiwannorth" #temporarily pinning on single region
+  tags = {
+    scenario = "Default"
+  }
+}
+
+
+resource "azurerm_resource_group" "this_rg" {
+  location = local.deployment_region
+  name     = module.naming.resource_group.name_unique
+  tags     = local.tags
+}
+
 # assign service principal Storage Blob Data Contributor role scoped to the resource group
 
 resource "azurerm_role_assignment" "example" {

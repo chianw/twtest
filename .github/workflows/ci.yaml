@@ -1,9 +1,9 @@
 ---
 name: Continuous Integration
 on:
-  pull_request:
-    branches:
-      - main
+  # pull_request:
+  #   branches:
+  #     - main
   workflow_dispatch:
     inputs:
       root_module_folder_relative_path:
