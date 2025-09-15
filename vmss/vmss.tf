@@ -94,6 +94,7 @@ module "terraform_azurerm_avm_res_compute_virtualmachinescaleset" {
       username   = "azureuser"
     }
   )]
+  zones = ["1"]
 
   enable_telemetry = false
   extension = [{
