@@ -18,4 +18,10 @@ module "avm-res-compute-virtualmachinescaleset" {
   extension_protected_setting = {}
   user_data_base64            = null
 
+  os_profile = {
+    linux_configuration = {
+      disable_password_authentication = true
+    }
+  }
+
 }
