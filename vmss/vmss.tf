@@ -26,6 +26,9 @@ module "avm-res-compute-virtualmachinescaleset" {
       patch_mode                      = "ImageDefault"
     }
   }
+  automatic_instance_repair = {
+    enabled = false
+  }
 
   sku_name = "Standard_B2ms"
   source_image_reference = {
