@@ -12,7 +12,7 @@ resource "azurerm_resource_group" "this" {
 
 # This is the module call
 module "disk" {
-  source  = "Azure/avm-res-compute-disk/azurerm//examples/default"
+  source  = "Azure/avm-res-compute-disk/azurerm"
   version = "v0.3.2"
 
   create_option = "Empty"
