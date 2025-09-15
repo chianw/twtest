@@ -21,6 +21,7 @@ module "avm-res-compute-virtualmachinescaleset" {
   os_profile = {
     linux_configuration = {
       disable_password_authentication = true
+      admin_username                  = "azureuser"
     }
   }
 
