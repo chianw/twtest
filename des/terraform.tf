@@ -6,8 +6,9 @@ terraform {
       version = "~> 2.4"
     }
     azurerm = {
-      source  = "hashicorp/azurerm"
-      version = ">= 4.0.0, < 5.0.0"
+      source = "hashicorp/azurerm"
+      # version = ">= 4.0.0, < 5.0.0"
+      version = "~> 3.71"
     }
     modtm = {
       source  = "azure/modtm"
