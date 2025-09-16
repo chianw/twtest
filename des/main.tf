@@ -17,9 +17,9 @@ module "avm_res_keyvault_vault" {
   source  = "Azure/avm-res-keyvault-vault/azurerm"
   version = "=0.10.0"
 
-  location                    = azurerm_resource_group.this_rg.location
+  location                    = azurerm_resource_group.this.location
   name                        = "${module.naming.key_vault.name_unique}-linux-ssh"
-  resource_group_name         = azurerm_resource_group.this_rg.name
+  resource_group_name         = azurerm_resource_group.this.name
   tenant_id                   = data.azurerm_client_config.current.tenant_id
   enabled_for_disk_encryption = true
   keys = {
@@ -50,11 +50,6 @@ module "avm_res_keyvault_vault" {
     deployment_user_keys = { #give the deployment user access to keys
       role_definition_id_or_name = "Key Vault Crypto Officer"
       principal_id               = data.azurerm_client_config.current.object_id
-    }
-    user_managed_identity_keys = { #give the user assigned managed identity for the disk encryption set access to keys
-      role_definition_id_or_name = "Key Vault Crypto Officer"
-      principal_id               = azurerm_user_assigned_identity.example_identity.principal_id
-      principal_type             = "ServicePrincipal"
     }
   }
 
