@@ -26,7 +26,7 @@ resource "azurerm_subnet" "subnet" {
 
 module "fw_public_ip" {
   source  = "Azure/avm-res-network-publicipaddress/azurerm"
-  version = "0.1.2"
+  version = "0.2.0"
 
   location = azurerm_resource_group.rg.location
   # insert the 3 required variables here
@@ -42,7 +42,7 @@ module "fw_public_ip" {
 
 module "fwpolicy" {
   source  = "Azure/avm-res-network-firewallpolicy/azurerm"
-  version = "0.2.0"
+  version = "0.3.3"
 
   location            = azurerm_resource_group.rg.location
   name                = module.naming.firewall_policy.name_unique
@@ -59,7 +59,7 @@ module "firewall" {
   # source             = "Azure/avm-res-network-firewall/azurerm"
   name                = module.naming.firewall.name
   resource_group_name = azurerm_resource_group.rg.name
-  enable_telemetry    = var.enable_telemetry
+  enable_telemetry    = false
   firewall_zones      = ["1", "2", "3"]
   ip_configurations = {
     default = {
