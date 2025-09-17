@@ -20,10 +20,8 @@ resource "azurerm_resource_group" "this" {
 # Leaving location as `null` will cause the module to use the resource group location
 # with a data source.
 module "test" {
-  source  = "Azure/avm-res-compute-sshpublickey/azurerm"
-  version = "0.1.0"
-
-  location            = azurerm_resource_group.this.location
+  source              = "Azure/avm-res-compute-sshpublickey/azurerm"
+  version             = "0.1.0"
   name                = "sshkeyexample"
   public_key          = tls_private_key.example.public_key_openssh
   resource_group_name = azurerm_resource_group.this.name
