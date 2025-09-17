@@ -37,7 +37,7 @@ module "fw_public_ip" {
   tags = {
     deployment = "terraform"
   }
-  zones = ["1", "2", "3"]
+  zones = ["1"]
 }
 
 module "fwpolicy" {
@@ -60,7 +60,7 @@ module "firewall" {
   name                = module.naming.firewall.name
   resource_group_name = azurerm_resource_group.rg.name
   enable_telemetry    = false
-  firewall_zones      = ["1", "2", "3"]
+  firewall_zones      = ["1"]
   ip_configurations = {
     default = {
       name                 = "ipconfig1"
