@@ -37,5 +37,5 @@ module "test" {
   server_version = 16
   sku_name       = "GP_Standard_D2s_v3"
   tags           = null
-#   zone           = 1
+  #   zone           = 1
 }
