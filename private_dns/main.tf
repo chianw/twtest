@@ -66,9 +66,8 @@ module "vnet2" {
 
 # reference the module and pass in variables as needed
 module "private_dns_zone" {
-  source  = "Azure/avm-res-network-privatednszone/azurerm//examples/default"
-  version = "0.4.2"
-
+  source           = "Azure/avm-res-network-privatednszone/azurerm"
+  version          = "0.4.2"
   domain_name      = local.domain_name
   parent_id        = local.parent_id
   a_records        = local.a_records
