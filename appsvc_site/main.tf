@@ -1,3 +1,4 @@
+
 # This ensures we have unique CAF compliant names for our resources.
 module "naming" {
   source  = "Azure/naming/azurerm"
@@ -16,7 +17,7 @@ resource "azurerm_service_plan" "example" {
   resource_group_name = azurerm_resource_group.example.name
   sku_name            = "P1v2"
   tags = {
-    app = "${module.naming.function_app.name_unique}-default"
+    app = module.naming.function_app.name_unique
   }
 }
 
@@ -33,24 +34,33 @@ resource "azurerm_storage_account" "example" {
   }
 }
 
+resource "azurerm_role_assignment" "example" {
+  principal_id         = module.avm_res_web_site.identity_principal_id
+  scope                = azurerm_storage_account.example.id
+  role_definition_name = "Storage Blob Data Owner"
+}
+
+# This is the module call
 module "avm_res_web_site" {
   source  = "Azure/avm-res-web-site/azurerm"
   version = "0.19.1"
 
   kind     = "functionapp"
   location = azurerm_resource_group.example.location
-  name     = "${module.naming.function_app.name_unique}-default"
+  name     = module.naming.function_app.name_unique
   # Uses an existing app service plan
-  os_type                    = azurerm_service_plan.example.os_type
-  resource_group_name        = azurerm_resource_group.example.name
-  service_plan_resource_id   = azurerm_service_plan.example.id
-  enable_telemetry           = false
-  storage_account_access_key = azurerm_storage_account.example.primary_access_key
+  os_type                  = azurerm_service_plan.example.os_type
+  resource_group_name      = azurerm_resource_group.example.name
+  service_plan_resource_id = azurerm_service_plan.example.id
+  enable_telemetry         = false
+  managed_identities = {
+    system_assigned = true
+  }
   # Uses an existing storage account
-  storage_account_name = azurerm_storage_account.example.name
+  storage_account_name          = azurerm_storage_account.example.name
+  storage_uses_managed_identity = true
   tags = {
     module  = "Azure/avm-res-web-site/azurerm"
     version = "0.17.2"
   }
-  vnet_image_pull_enabled = true
 }
