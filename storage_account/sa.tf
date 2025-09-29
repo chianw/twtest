@@ -3,6 +3,7 @@ module "naming" {
   version = "~> 0.4"
 }
 
+data "azurerm_client_config" "current" {}
 
 locals {
   #deployment_region = module.regions.regions[random_integer.region_index.result].name
