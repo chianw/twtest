@@ -16,9 +16,12 @@ module "test" {
   source  = "Azure/avm-res-web-serverfarm/azurerm"
   version = "0.7.0"
 
-  location            = azurerm_resource_group.this.location
-  name                = module.naming.app_service_plan.name_unique
-  os_type             = "Windows"
-  resource_group_name = azurerm_resource_group.this.name
-  enable_telemetry    = false
+  location               = azurerm_resource_group.this.location
+  name                   = module.naming.app_service_plan.name_unique
+  os_type                = "Windows"
+  resource_group_name    = azurerm_resource_group.this.name
+  enable_telemetry       = false
+  worker_count           = 1
+  zone_balancing_enabled = false
+  sku_name               = "B1"
 }
