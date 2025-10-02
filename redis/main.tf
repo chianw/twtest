@@ -81,12 +81,7 @@ module "default" {
       private_dns_zone_resource_ids = [azurerm_private_dns_zone.this.id]
     }
   }
-  public_network_access_enabled = false
-  redis_configuration = {
-    maxmemory_reserved = 1330
-    maxmemory_delta    = 1330
-    maxmemory_policy   = "allkeys-lru"
-  }
-  tags  = local.tags
-  zones = ["1"]
+  public_network_access_enabled = true
+  tags                          = local.tags
+  zones                         = ["1"]
 }
