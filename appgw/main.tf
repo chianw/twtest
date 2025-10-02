@@ -1,0 +1,95 @@
+
+# This ensures we have unique CAF compliant names for our resources.
+module "naming" {
+  source  = "Azure/naming/azurerm"
+  version = "0.3.0"
+
+  suffix = ["agw"]
+}
+
+
+
+module "application_gateway" {
+  source  = "Azure/avm-res-network-applicationgateway/azurerm"
+  version = "0.4.3"
+
+  # Backend address pool configuration for the application gateway
+  # Mandatory Input
+  backend_address_pools = {
+    appGatewayBackendPool = {
+      name         = "appGatewayBackendPool"
+      ip_addresses = ["100.64.2.6", "100.64.2.5"]
+      #fqdns        = ["example1.com", "example2.com"]
+    }
+  }
+  # Backend http settings configuration for the application gateway
+  # Mandatory Input
+  backend_http_settings = {
+    appGatewayBackendHttpSettings = {
+      name = "appGatewayBackendHttpSettings"
+      #Github issue #55 allow custom port for the backend
+      port                  = 80
+      protocol              = "Http"
+      cookie_based_affinity = "Disabled"
+      path                  = "/"
+      request_timeout       = 30
+
+
+      connection_draining = {
+        enable_connection_draining = true
+        drain_timeout_sec          = 300
+
+      }
+    }
+    # Add more http settings as needed
+  }
+  # frontend port configuration block for the application gateway
+  # WAF : This example NO HTTPS, We recommend to  Secure all incoming connections using HTTPS for production services with end-to-end SSL/TLS or SSL/TLS termination at the Application Gateway to protect against attacks and ensure data remains private and encrypted between the web server and browsers.
+  # WAF : Please refer kv_selfssl_waf_https_app_gateway example for HTTPS configuration
+  frontend_ports = {
+    frontend-port-80 = {
+      name = "frontend-port-80"
+      port = 8080
+    }
+  }
+  gateway_ip_configuration = {
+    subnet_id = azurerm_subnet.backend.id
+  }
+  # Http Listerners configuration for the application gateway
+  # Mandatory Input
+  http_listeners = {
+    appGatewayHttpListener = {
+      name               = "appGatewayHttpListener"
+      host_name          = null
+      frontend_port_name = "frontend-port-80"
+    }
+    # # Add more http listeners as needed
+  }
+  location = azurerm_resource_group.rg_group.location
+  # provide Application gateway name
+  name = module.naming.application_gateway.name_unique
+  # Routing rules configuration for the backend pool
+  # Mandatory Input
+  request_routing_rules = {
+    routing-rule-1 = {
+      name                       = "rule-1"
+      rule_type                  = "Basic"
+      http_listener_name         = "appGatewayHttpListener"
+      backend_address_pool_name  = "appGatewayBackendPool"
+      backend_http_settings_name = "appGatewayBackendHttpSettings"
+      priority                   = 100
+    }
+    # Add more rules as needed
+  }
+  resource_group_name = azurerm_resource_group.rg_group.name
+
+  # pre-requisites resources input required for the module
+  public_ip_name = "${module.naming.public_ip.name_unique}-pip"
+  tags = {
+    environment = "dev"
+    owner       = "application_gateway"
+    project     = "AVM"
+  }
+  # Zone redundancy for the application gateway
+  zones = ["1"]
+}
